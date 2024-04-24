@@ -6,7 +6,7 @@
 /*   By: bherranz <bherranz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:00:38 by bherranz          #+#    #+#             */
-/*   Updated: 2024/04/13 17:04:23 by bherranz         ###   ########.fr       */
+/*   Updated: 2024/04/24 12:01:53 by bherranz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,13 @@
 # include <stdio.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <fcntl.h>
 # include "libft/libft.h"
 
-
+	typedef struct s_pipe
+	{
+		char	**envp;
+		int		pipe[2];
+	} t_pipe;
 
 #endif
