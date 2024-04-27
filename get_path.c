@@ -1,35 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   get_path.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bherranz <bherranz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/13 17:00:38 by bherranz          #+#    #+#             */
-/*   Updated: 2024/04/27 14:01:10 by bherranz         ###   ########.fr       */
+/*   Created: 2024/04/27 12:26:59 by bherranz          #+#    #+#             */
+/*   Updated: 2024/04/27 14:06:46 by bherranz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#include "pipex.h"
 
-# include <unistd.h>
-# include <stdlib.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include <fcntl.h>
-# include "libft/libft.h"
-
-	typedef struct s_pipe
+char	*get_path(char **envp)
+{
+	while (**envp)
 	{
-		char	**envp;
-		int		tube[2];
-		char	**argv;
-		char	**path;
-	} t_pipe;
+		if (strncmp(*envp, "PATH=", 5) == 0)
+		{	
+			*envp = *envp + 5;
+			return (*envp);
+		}
+		envp++;
+	}
+	return (NULL);
+}
 
-	char	*get_path(char **envp);
-	char	**div_paths(char *path);
+char	**div_paths(char *path)
+{
+	char	**rutes;
+	int		i;
 
-#endif
+	rutes = ft_split(path, ':');
+	i = 0;
+	while (rutes[i])
+	{
+		rutes[i] = ft_strjoin(rutes[i], "/");
+		i++;
+	}
+	return (rutes);
+}
+

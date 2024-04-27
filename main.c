@@ -6,7 +6,7 @@
 /*   By: bherranz <bherranz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:59:59 by bherranz          #+#    #+#             */
-/*   Updated: 2024/04/24 12:32:03 by bherranz         ###   ########.fr       */
+/*   Updated: 2024/04/27 14:02:29 by bherranz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,63 +42,61 @@ int	redir_out(char *file)
 	return (0);
 }
 
-void	execute_cmd1(char **cmd, int *pipe1, char **envp)
+void	process(t_pipe my_pipe)
 {
-	pid_t	pid;
-
+	if (pipe(my_pipe.tube))
+	{
+		perror("Error creating the pipe");
+		exit(1);
+	}
+	pid_t pid;
 	pid = fork();
 	if (pid < 0)
 	{
 		perror("Error forking");
-		exit(1);
+		exit (1);
 	}
-	else if (pid == 0) //child process
+	else if (pid == 0)
 	{
-		dup2(pipe1[1], STDOUT_FILENO);
-		close(pipe1[1]);
-		if (execve(cmd[1], cmd, envp) == -1)
-		{
-			perror("Execution failed");
-			exit(1);
-		}
-	}
-	else //parent
-	{
-		close(pipe1[1]);
+		close(STDOUT_FILENO);
+		dup(my_pipe.tube[1]);
+		close(my_pipe.tube[1]);
+		redir_input(my_pipe.argv[1]);
+		my_pipe.path = div_paths(get_path(my_pipe.envp));
+		// encontrar el path del comando, gestionar si  no se encuentra el comando
+		execve(*my_pipe.path, &my_pipe.argv[2], my_pipe.envp);
 	}
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	//create the pipe
-	int pipe1[2];
+	t_pipe	my_pipe;
 
-	pipe(pipe1);
-	if (pipe1 < 0)
+	if (argc != 5)
 	{
-		perror("Error creating pipe");
+		perror("Incorrect format");
 		exit (1);
 	}
-	if (argc != 5)
-		exit(1);
-	if (redir_input(argv[1]) == 1)
-		exit (1);
-	//execute command1, now STDIN is archivo 1 fd
-	execute_cmd1(argv, pipe1, envp);
-	// if (redir_output(argv[4]) == 1)
-	// 	return (1);
-	//execute command2, now STDOUT is archivo 2 fd
-	//execute_cmd2(argv[3]);
-	close(pipe1[1]);
-	wait(NULL);
-	return (0);
+	my_pipe.envp = envp;
+	my_pipe.argv = argv;
+	/*my_pipe.path = find_my_path(argv[1]);
+	process(my_pipe);*/
+	// para probar si estoy encontrando bien los paths
+	char *path = get_path(envp);
+	printf("%s\n", path);
+	char **rutes = div_paths(path);
+	while (*rutes)
+	{
+		printf("%s\n", *rutes);
+		rutes++;
+	}
+	my_pipe.path = div_paths(get_path(my_pipe.envp));
+	execve(*my_pipe.path, &my_pipe.argv[2], my_pipe.envp);
+	exit(1);
 }
 
-//Steps
 /*
-	create de pipe between first and second command
-	redirect stdin to file2
-	execute first command
-	execute second command with the output of the first one
-	redirect the output to file2
+Steps:
+	Encontrar path: buscar path en envp, despues buscar en esas carpetas
+	y si no encuentras el comando, lo mandas sin path(el comando tal cual)
 */

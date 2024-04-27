@@ -1,7 +1,7 @@
 NAME = pipex
 PROGRAM = pipex
 
-SRCS = main.c
+SRCS = main.c get_path.c
 
 OBJS = ${SRCS:.c=.o}
 
