@@ -21,15 +21,8 @@
 # include <fcntl.h>
 # include "libft/libft.h"
 
-	typedef struct s_pipe
-	{
-		char	**envp;
-		int		tube[2];
-		char	**argv;
-		char	**path;
-	} t_pipe;
-
-	char	*get_path(char **envp);
-	char	**div_paths(char *path);
+char	**div_paths(char **evnp);
+void	execute(char *argv, char **envp);
+void	print_error(char *msg);
 
 #endif

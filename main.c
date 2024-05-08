@@ -12,87 +12,59 @@
 
 #include "pipex.h"
 
-int	redir_input(char *file)
+void	print_error(char *msg)
 {
-	int	in;
-
-	in = open(file, O_RDONLY);
-	if (in < 0)
-	{
-		perror("Error while opening the file");
-		return (1);
-	}
-	dup2(in, STDIN_FILENO);
-	close(in);
-	return (0);
+	perror(msg);
+	exit (1);
 }
 
-int	redir_out(char *file)
+void	process_in(char *file, char *cmd, char **envp, int *in_pipe)
 {
-	int	out;
+	pid_t	pid;
+	int		fd;
+	int		status;
 
-	out = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (out < 0)
-	{
-		perror("Error while opening the file");
-		return (1);
-	}
-	dup2(out, STDOUT_FILENO);
-	close(out);
-	return (0);
-}
-
-void	process(t_pipe my_pipe)
-{
-	if (pipe(my_pipe.tube))
-	{
-		perror("Error creating the pipe");
-		exit(1);
-	}
-	pid_t pid;
 	pid = fork();
 	if (pid < 0)
-	{
-		perror("Error forking");
-		exit (1);
-	}
+		print_error("Error forking");
 	else if (pid == 0)
 	{
-		close(STDOUT_FILENO);
-		dup(my_pipe.tube[1]);
-		close(my_pipe.tube[1]);
-		redir_input(my_pipe.argv[1]);
-		my_pipe.path = div_paths(get_path(my_pipe.envp));
-		// encontrar el path del comando, gestionar si  no se encuentra el comando
-		execve(*my_pipe.path, &my_pipe.argv[2], my_pipe.envp);
+		fd = open(file, O_RDONLY);
+		
+		if (fd < 0)
+			print_error("Error while opening the file");
+		close(in_pipe[0]);
+		dup2(fd, STDIN_FILENO);
+		//dup2(in_pipe[1], STDOUT_FILENO);
+		execute(cmd, envp);
+	}
+	else
+	{
+		close (in_pipe[0]);
+		close (in_pipe[1]);
+		waitpid(pid, &status, 0);
 	}
 }
+/*
+int	process_out(char *file)
+{
+
+}*/
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_pipe	my_pipe;
+	int		my_pipe[2];
 
 	if (argc != 5)
 	{
 		perror("Incorrect format");
 		exit (1);
 	}
-	my_pipe.envp = envp;
-	my_pipe.argv = argv;
-	/*my_pipe.path = find_my_path(argv[1]);
-	process(my_pipe);*/
-	// para probar si estoy encontrando bien los paths
-	char *path = get_path(envp);
-	printf("%s\n", path);
-	char **rutes = div_paths(path);
-	while (*rutes)
-	{
-		printf("%s\n", *rutes);
-		rutes++;
-	}
-	my_pipe.path = div_paths(get_path(my_pipe.envp));
-	execve(*my_pipe.path, &my_pipe.argv[2], my_pipe.envp);
-	exit(1);
+	if (pipe(my_pipe) < 0)
+		print_error("Error creating the pipe");
+	process_in(argv[1], argv[2], envp, my_pipe);
+
+	//process_out(argv[3], argv[4], envp);
 }
 
 /*
