@@ -1,1 +1,11 @@
-       2
+bonus
+get_path.c
+get_path.o
+in
+libft
+main.c
+main.o
+Makefile
+out
+pipex
+pipex.h
