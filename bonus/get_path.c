@@ -24,7 +24,7 @@ char	**div_paths(char **envp)
 		envp++;
 	}
 	if (!rutes)
-		return (NULL); //igual aquí va un perror
+		return (NULL);
 	i = 0;
 	while (rutes[i])
 	{
@@ -54,4 +54,3 @@ void	execute(char *argv, char **envp)
 	}
 	print_error("Command not found");
 }
-

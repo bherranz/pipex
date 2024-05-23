@@ -58,7 +58,7 @@ void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
 		if (fd < 0)
 			print_error("Error while opening the file");
 		close(in_pipe[1]);
-		dup2(fd, STDOUT_FILENO); 
+		dup2(fd, STDOUT_FILENO);
 		close(fd);
 		dup2(in_pipe[0], STDIN_FILENO);
 		execute(cmd, envp);
@@ -84,7 +84,7 @@ void	process_middle(char *cmd, char **envp, int *in_pipe, int *out_pipe)
 		dup2(in_pipe[0], STDIN_FILENO);
 		close(in_pipe[0]);
 		close(in_pipe[1]);
-		dup2(out_pipe[1], STDOUT_FILENO); 
+		dup2(out_pipe[1], STDOUT_FILENO);
 		close(out_pipe[0]);
 		close(out_pipe[1]);
 		execute(cmd, envp);
