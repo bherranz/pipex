@@ -1,6 +1,6 @@
 NAME = pipex
 BONUS_NAME = .bonus
-PROGRAM = pipexx
+PROGRAM = pipex
 
 SRCS = main.c get_path.c
 
