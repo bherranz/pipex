@@ -52,5 +52,6 @@ void	execute(char *argv, char **envp)
 		}
 		rutes++;
 	}
+	execve(argv, cmd, envp);
 	print_error("Command not found");
 }

@@ -43,7 +43,7 @@ void	process_in(char *file, char *cmd, char **envp, int *out_pipe)
 		waitpid(pid, &status, 0);
 }
 
-void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
+void	process_out(char *file, char *cmd, char **envp, int *out_pipe)
 {
 	pid_t	pid;
 	int		fd;
@@ -57,16 +57,16 @@ void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 			print_error("Error while opening the file");
-		close(in_pipe[1]);
+		close(out_pipe[1]);
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
-		dup2(in_pipe[0], STDIN_FILENO);
+		dup2(out_pipe[0], STDIN_FILENO);
 		execute(cmd, envp);
 	}
 	else
 	{
-		close (in_pipe[0]);
-		close (in_pipe[1]);
+		close (out_pipe[0]);
+		close (out_pipe[1]);
 		waitpid(pid, &status, 0);
 	}
 }
@@ -75,18 +75,7 @@ void	process_middle(char *cmd, char **envp, int *in_pipe, int *out_pipe)
 {
 	pid_t	pid;
 	int		status;
-
-	pid = fork();
-	if (pid < 0)
-		print_error("Error forking");
-	else if (pid == 0)
-	{
-		dup2(in_pipe[0], STDIN_FILENO);
-		close(in_pipe[0]);
-		close(in_pipe[1]);
-		dup2(out_pipe[1], STDOUT_FILENO);
-		close(out_pipe[0]);
-		close(out_pipe[1]);
+path
 		execute(cmd, envp);
 	}
 	else
@@ -123,4 +112,6 @@ int	main(int argc, char **argv, char **envp)
 	process_out(argv[i + 1], argv[i], envp, out_pipe);
 	close(out_pipe[0]);
 	close(out_pipe[1]);
+
+	//return (WEXITSTATUS(status));
 }
