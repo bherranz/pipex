@@ -105,7 +105,7 @@ int	main(int argc, char **argv, char **envp)
 		print_error("Incorrect format");
 	if (pipe(out_pipe) < 0)
 		print_error("Error creating the pipe");
-	pids = malloc(sizeof(pid_t)*(argc - 3));
+	pids = malloc(sizeof(pid_t) * (argc - 3));
 	pids[argc - 3] = '\0';
 	pids[0] = process_in(argv[1], argv[2], envp, out_pipe);
 	i = 3;

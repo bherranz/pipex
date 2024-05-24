@@ -53,7 +53,7 @@ void	execute(char *argv, char **envp)
 		}
 		rutes++;
 	}
-	execve(argv, cmd, envp);
+	execve(cmd[0], cmd, envp);
 	perror("command not found");
 	exit (127);
 }
