@@ -48,10 +48,12 @@ void	execute(char *argv, char **envp)
 		if (access(path, X_OK) == 0)
 		{
 			execve(path, cmd, envp);
-			print_error("Fail in execution");
+			perror("Fail in execution");
+			exit (127);
 		}
 		rutes++;
 	}
 	execve(argv, cmd, envp);
-	print_error("Command not found");
+	perror("command not found");
+	exit (127);
 }

@@ -18,11 +18,10 @@ void	print_error(char *msg)
 	exit (1);
 }
 
-void	process_in(char *file, char *cmd, char **envp, int *out_pipe)
+pid_t	process_in(char *file, char *cmd, char **envp, int *out_pipe)
 {
 	pid_t	pid;
 	int		fd;
-	int		status;
 
 	pid = fork();
 	if (pid < 0)
@@ -39,15 +38,13 @@ void	process_in(char *file, char *cmd, char **envp, int *out_pipe)
 		close(out_pipe[1]);
 		execute(cmd, envp);
 	}
-	else
-		waitpid(pid, &status, 0);
+	return (pid);
 }
 
-void	process_out(char *file, char *cmd, char **envp, int *out_pipe)
+pid_t	process_out(char *file, char *cmd, char **envp, int *out_pipe)
 {
 	pid_t	pid;
 	int		fd;
-	int		status;
 
 	pid = fork();
 	if (pid < 0)
@@ -67,36 +64,50 @@ void	process_out(char *file, char *cmd, char **envp, int *out_pipe)
 	{
 		close (out_pipe[0]);
 		close (out_pipe[1]);
-		waitpid(pid, &status, 0);
 	}
+	return (pid);
 }
 
-void	process_middle(char *cmd, char **envp, int *in_pipe, int *out_pipe)
+pid_t	process_middle(char *cmd, char **envp, int *in_pipe, int *out_pipe)
 {
 	pid_t	pid;
-	int		status;
-path
+
+	pid = fork();
+	if (pid < 0)
+		print_error("Error forking");
+	else if (pid == 0)
+	{
+		dup2(in_pipe[0], STDIN_FILENO);
+		close(in_pipe[0]);
+		dup2(out_pipe[1], STDOUT_FILENO);
+		close(out_pipe[0]);
+		close(out_pipe[1]);
+		close(in_pipe[1]);
 		execute(cmd, envp);
 	}
 	else
 	{
 		close (in_pipe[0]);
 		close (in_pipe[1]);
-		waitpid(pid, &status, 0);
 	}
+	return (pid);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	int	in_pipe[2];
-	int	out_pipe[2];
-	int	i;
+	int		in_pipe[2];
+	int		out_pipe[2];
+	int		i;
+	pid_t	*pids;
+	int		status;
 
 	if (argc < 5)
 		print_error("Incorrect format");
 	if (pipe(out_pipe) < 0)
 		print_error("Error creating the pipe");
-	process_in(argv[1], argv[2], envp, out_pipe);
+	pids = malloc(sizeof(pid_t)*(argc - 3));
+	pids[argc - 3] = '\0';
+	pids[0] = process_in(argv[1], argv[2], envp, out_pipe);
 	i = 3;
 	while (argv[i + 2])
 	{
@@ -104,14 +115,18 @@ int	main(int argc, char **argv, char **envp)
 		in_pipe[1] = out_pipe[1];
 		if (pipe(out_pipe) < 0)
 			print_error("Error creating the pipe");
-		process_middle(argv[i], envp, in_pipe, out_pipe);
+		pids[i - 2] = process_middle(argv[i], envp, in_pipe, out_pipe);
 		close(in_pipe[0]);
 		close(in_pipe[1]);
 		i++;
 	}
-	process_out(argv[i + 1], argv[i], envp, out_pipe);
+	pids[i - 2] = process_out(argv[i + 1], argv[i], envp, out_pipe);
 	close(out_pipe[0]);
 	close(out_pipe[1]);
-
-	//return (WEXITSTATUS(status));
+	while (*pids)
+	{
+		waitpid(*pids, &status, 0);
+		pids++;
+	}
+	return (WEXITSTATUS(status));
 }
