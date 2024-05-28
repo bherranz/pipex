@@ -41,6 +41,11 @@ void	execute(char *argv, char **envp)
 	char	*path;
 
 	cmd = ft_split(argv, ' ');
+	if (ft_strchr(argv, '/') != NULL)
+	{
+		execve(argv, cmd, envp);
+		print_error("fail in execution", 127);
+	}
 	rutes = div_paths(envp);
 	while (*rutes)
 	{
@@ -48,12 +53,10 @@ void	execute(char *argv, char **envp)
 		if (access(path, X_OK) == 0)
 		{
 			execve(path, cmd, envp);
-			perror("Fail in execution");
-			exit (127);
+			print_error("fail in execution", 127);
 		}
 		rutes++;
 	}
 	execve(cmd[0], cmd, envp);
-	perror("command not found");
-	exit (127);
+	print_error("command not found", 127);
 }

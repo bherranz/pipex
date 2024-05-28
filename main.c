@@ -12,10 +12,10 @@
 
 #include "pipex.h"
 
-void	print_error(char *msg)
+void	print_error(char *msg, int err)
 {
 	perror(msg);
-	exit (1);
+	exit (err);
 }
 
 void	process_in(char *file, char *cmd, char **envp, int *in_pipe)
@@ -26,12 +26,12 @@ void	process_in(char *file, char *cmd, char **envp, int *in_pipe)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking");
+		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
 		fd = open(file, O_RDONLY);
 		if (fd < 0)
-			print_error("Error while opening the file");
+			print_error("Error while opening the file", 1);
 		close(in_pipe[0]);
 		dup2(fd, STDIN_FILENO);
 		close(fd);
@@ -51,12 +51,12 @@ void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking");
+		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
-			print_error("Error while opening the file");
+			print_error("Error while opening the file", 1);
 		close(in_pipe[1]);
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
@@ -76,9 +76,9 @@ int	main(int argc, char **argv, char **envp)
 	int		my_pipe[2];
 
 	if (argc != 5)
-		print_error("Incorrect format");
+		print_error("Incorrect format", 1);
 	if (pipe(my_pipe) < 0)
-		print_error("Error creating the pipe");
+		print_error("Error creating the pipe", 1);
 	process_in(argv[1], argv[2], envp, my_pipe);
 	process_out(argv[4], argv[3], envp, my_pipe);
 	close(my_pipe[0]);

@@ -23,6 +23,6 @@
 
 char	**div_paths(char **evnp);
 void	execute(char *argv, char **envp);
-void	print_error(char *msg);
+void	print_error(char *msg, int err);
 
 #endif

@@ -48,9 +48,9 @@ void	execute(char *argv, char **envp)
 		if (access(path, X_OK) == 0)
 		{
 			execve(path, cmd, envp);
-			print_error("Fail in execution");
+			print_error("Fail in execution", 127);
 		}
 		rutes++;
 	}
-	print_error("Command not found");
+	print_error("Command not found", 127);
 }

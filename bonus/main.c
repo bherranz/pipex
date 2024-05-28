@@ -12,10 +12,10 @@
 
 #include "pipex.h"
 
-void	print_error(char *msg)
+void	print_error(char *msg, int err)
 {
 	perror(msg);
-	exit (1);
+	exit (err);
 }
 
 pid_t	process_in(char *file, char *cmd, char **envp, int *out_pipe)
@@ -25,12 +25,12 @@ pid_t	process_in(char *file, char *cmd, char **envp, int *out_pipe)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking");
+		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
 		fd = open(file, O_RDONLY);
 		if (fd < 0)
-			print_error("Error while opening the file");
+			print_error("Error while opening the file", 1);
 		close(out_pipe[0]);
 		dup2(fd, STDIN_FILENO);
 		close(fd);
@@ -48,12 +48,12 @@ pid_t	process_out(char *file, char *cmd, char **envp, int *out_pipe)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking");
+		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
-			print_error("Error while opening the file");
+			print_error("Error while opening the file", 1);
 		close(out_pipe[1]);
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
@@ -74,7 +74,7 @@ pid_t	process_middle(char *cmd, char **envp, int *in_pipe, int *out_pipe)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking");
+		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
 		dup2(in_pipe[0], STDIN_FILENO);
@@ -102,11 +102,10 @@ int	main(int argc, char **argv, char **envp)
 	int		status;
 
 	if (argc < 5)
-		print_error("Incorrect format");
+		print_error("Incorrect format", 1);
 	if (pipe(out_pipe) < 0)
-		print_error("Error creating the pipe");
-	pids = malloc(sizeof(pid_t) * (argc - 3));
-	pids[argc - 3] = '\0';
+		print_error("Error creating the pipe", 1);
+	pids = ft_calloc((argc - 2), sizeof(pid_t));
 	pids[0] = process_in(argv[1], argv[2], envp, out_pipe);
 	i = 3;
 	while (argv[i + 2])
@@ -114,7 +113,7 @@ int	main(int argc, char **argv, char **envp)
 		in_pipe[0] = out_pipe[0];
 		in_pipe[1] = out_pipe[1];
 		if (pipe(out_pipe) < 0)
-			print_error("Error creating the pipe");
+			print_error("Error creating the pipe", 1);
 		pids[i - 2] = process_middle(argv[i], envp, in_pipe, out_pipe);
 		close(in_pipe[0]);
 		close(in_pipe[1]);
@@ -123,10 +122,12 @@ int	main(int argc, char **argv, char **envp)
 	pids[i - 2] = process_out(argv[i + 1], argv[i], envp, out_pipe);
 	close(out_pipe[0]);
 	close(out_pipe[1]);
-	while (*pids)
+	i = 0;
+	while (pids[i])
 	{
-		waitpid(*pids, &status, 0);
-		pids++;
+		waitpid(pids[i], &status, 0);
+		i++;
 	}
+	free(pids);
 	return (WEXITSTATUS(status));
 }
