@@ -4,7 +4,7 @@ PROGRAM = pipex
 
 SRCS = main.c get_path.c
 
-BONUS = bonus/main.c bonus/get_path.c
+BONUS = bonus/main.c bonus/get_path.c bonus/here_doc.c bonus/gnl/get_next_line.c bonus/gnl/get_next_line_utils.c
 
 OBJS = ${SRCS:.c=.o}
 BONUS_OBJS = ${BONUS:.c=.o}

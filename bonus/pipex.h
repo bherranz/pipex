@@ -13,6 +13,10 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 100
+# endif
+
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdio.h>
@@ -21,9 +25,19 @@
 # include <fcntl.h>
 # include "../libft/libft.h"
 
+typedef struct s_pipex
+{
+	char	**envp;
+	int		prev[2];
+	int		current[2];
+	char	**argv;
+	int		pos;
+}	t_pipex;
+
 char	**div_paths(char **evnp);
 void	execute(char *argv, char **envp);
 void	print_error(char *msg, int err);
+pid_t	process_here(t_pipex *pipex);
 
 //gnl
 char	*read_buffer(int fd, char *buffer);

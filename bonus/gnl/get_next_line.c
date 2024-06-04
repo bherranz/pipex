@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../checker_bonus.h"
+#include "../pipex.h"
 
 char	*read_buffer(int fd, char *buffer)
 {

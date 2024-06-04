@@ -61,6 +61,7 @@ void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
 		dup2(in_pipe[0], STDIN_FILENO);
+		close(in_pipe[0]);
 		execute(cmd, envp);
 	}
 	else
