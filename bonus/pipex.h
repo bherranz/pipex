@@ -32,6 +32,7 @@ typedef struct s_pipex
 	int		current[2];
 	char	**argv;
 	int		pos;
+	int		here_doc;
 }	t_pipex;
 
 char	**div_paths(char **evnp);

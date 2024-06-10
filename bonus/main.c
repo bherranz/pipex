@@ -51,7 +51,10 @@ pid_t	process_out(t_pipex *pipex)
 		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
-		fd = open(pipex->argv[(pipex->pos) + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (pipex->here_doc == 0)
+			fd = open(pipex->argv[(pipex->pos) + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else
+			fd = open(pipex->argv[(pipex->pos) + 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (fd < 0)
 			print_error("Error while opening the file", 1);
 		close(pipex->current[1]);
@@ -106,11 +109,12 @@ int	main(int argc, char **argv, char **envp)
 	pipex.argv = argv;
 	pipex.envp = envp;
 	pipex.pos = 1;
+	pipex.here_doc = 0;
 	if (ft_strncmp(pipex.argv[pipex.pos], "here_doc", ft_strlen(pipex.argv[pipex.pos])) == 0)
 	{
+		pipex.here_doc = 1;
 		pids = ft_calloc((argc - 3), sizeof(pid_t));
-		pids[0] = process_here(&pipex);	
-		pipex.pos++;
+		pids[0] = process_here(&pipex);
 	}
 	else
 	{
@@ -124,12 +128,12 @@ int	main(int argc, char **argv, char **envp)
 		pipex.prev[1] = pipex.current[1];
 		if (pipe(pipex.current) < 0)
 			print_error("Error creating the pipe", 1);
-		pids[pipex.pos - 2] = process_middle(&pipex);
+		pids[pipex.pos - 2 - pipex.here_doc] = process_middle(&pipex);
 		close(pipex.prev[0]);
 		close(pipex.prev[1]);
 		pipex.pos++;
 	}
-	pids[pipex.pos - 4] = process_out(&pipex);
+	pids[pipex.pos - 2 - pipex.here_doc] = process_out(&pipex);
 	close(pipex.current[0]);
 	close(pipex.current[1]);
 	pipex.pos = 0;

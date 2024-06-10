@@ -27,8 +27,12 @@ void	here_doc(char *limit, int *my_pipe)
 		else
 			max_len = ft_strlen(limit);
 		if (ft_strncmp(line, limit, max_len) == 0)
+		{
+			free(line);
 			break ;
+		}
 		ft_putstr_fd(line, my_pipe[1]);
+		free(line);
 	}
 }
 
@@ -53,5 +57,6 @@ pid_t	process_here(t_pipex *pipex)
 		close(here_pipe[1]);
 		execute(pipex->argv[(pipex->pos) + 2], pipex->envp);
 	}
+	waitpid(pid, NULL, 0);
 	return (pid);
 }
