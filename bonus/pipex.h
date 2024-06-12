@@ -38,7 +38,13 @@ typedef struct s_pipex
 char	**div_paths(char **evnp);
 void	execute(char *argv, char **envp);
 void	print_error(char *msg, int err);
+
+//processes
+pid_t	process_in(t_pipex *pipex);
 pid_t	process_here(t_pipex *pipex);
+pid_t	process_middle(t_pipex *pipex);
+int		get_fd(t_pipex *pipex);
+pid_t	process_out(t_pipex *pipex);
 
 //gnl
 char	*read_buffer(int fd, char *buffer);

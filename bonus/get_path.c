@@ -18,10 +18,13 @@ char	**div_paths(char **envp)
 	int		i;
 
 	rutes = NULL;
-	while (*envp)
+	while (envp && *envp)
 	{
 		if (ft_strncmp(*envp, "PATH=", 5) == 0)
+		{
 			rutes = ft_split(*envp + 5, ':');
+			break ;
+		}
 		envp++;
 	}
 	if (!rutes)
@@ -35,20 +38,11 @@ char	**div_paths(char **envp)
 	return (rutes);
 }
 
-void	execute(char *argv, char **envp)
+void	access_path(char **rutes, char **cmd, char **envp)
 {
-	char	**cmd;
-	char	**rutes;
 	char	*path;
 
 	path = NULL;
-	cmd = ft_split(argv, ' ');
-	if ((ft_strchr(argv, '/') != NULL))
-	{
-		execve(cmd[0], cmd, envp);
-		print_error("fail in execution", 127);
-	}
-	rutes = div_paths(envp);
 	while (rutes && *rutes)
 	{
 		path = ft_strjoin(*rutes, cmd[0]);
@@ -61,6 +55,19 @@ void	execute(char *argv, char **envp)
 	}
 	if (path)
 		free(path);
+}
+
+void	execute(char *argv, char **envp)
+{
+	char	**cmd;
+
+	cmd = ft_split(argv, ' ');
+	if ((ft_strchr(argv, '/') != NULL))
+	{
+		execve(cmd[0], cmd, envp);
+		print_error("fail in execution", 127);
+	}
+	access_path(div_paths(envp), cmd, envp);
 	execve(cmd[0], cmd, envp);
 	print_error("command not found", 127);
 }
