@@ -20,33 +20,23 @@ void	print_error(char *msg, int err)
 
 void	ft_pids(t_pipex *pipex, int argc, pid_t **pids)
 {
-	
-
+	*pids = ft_calloc((argc - 2 - pipex->here_doc), sizeof(pid_t));
 	if (pipex->here_doc == 1)
-	{
-		*pids = ft_calloc((argc - 3), sizeof(pid_t));
 		*pids[0] = process_here(pipex);
-	}
 	else
-	{
-		*pids = ft_calloc((argc - 2), sizeof(pid_t));
 		*pids[0] = process_in(pipex);
-	}
 	pipex->pos += 2;
 	while (pipex->argv[pipex->pos + 2])
 	{
 		pipex->prev[0] = pipex->current[0];
 		pipex->prev[1] = pipex->current[1];
-
 		if (pipe(pipex->current) < 0)
 			print_error("Error creating the pipe", 1);
-
 		(*pids)[pipex->pos - 2 - pipex->here_doc] = process_middle(pipex);
 		close(pipex->prev[0]);
 		close(pipex->prev[1]);
 		pipex->pos++;
 	}
-
 	(*pids)[pipex->pos - 2 - pipex->here_doc] = process_out(pipex);
 	close(pipex->current[0]);
 	close(pipex->current[1]);
@@ -62,7 +52,8 @@ int	main(int argc, char **argv, char **envp)
 	pipex.argv = argv;
 	pipex.envp = envp;
 	pipex.pos = 1;
-	if (ft_strncmp(pipex.argv[pipex.pos], "here_doc", ft_strlen(pipex.argv[pipex.pos])) == 0)
+	if (ft_strncmp(pipex.argv[pipex.pos], "here_doc",
+			ft_strlen(pipex.argv[pipex.pos])) == 0)
 		pipex.here_doc = 1;
 	if ((argc < 5 && pipex.here_doc == 0) || (pipex.here_doc == 1 && argc < 6))
 		print_error("Incorrect format", 1);
