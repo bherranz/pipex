@@ -21,6 +21,13 @@
 # include <fcntl.h>
 # include "libft/libft.h"
 
+typedef struct s_pipex
+{
+	char	**envp;
+	int		current[2];
+	char	**argv;
+}	t_pipex;
+
 char	**div_paths(char **evnp);
 void	execute(char *argv, char **envp);
 void	print_error(char *msg, int err);

@@ -18,70 +18,74 @@ void	print_error(char *msg, int err)
 	exit (err);
 }
 
-void	process_in(char *file, char *cmd, char **envp, int *in_pipe)
+pid_t	process_in(t_pipex *pipex)
 {
 	pid_t	pid;
 	int		fd;
-	int		status;
 
 	pid = fork();
 	if (pid < 0)
 		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
-		fd = open(file, O_RDONLY);
+		fd = open(pipex->argv[1], O_RDONLY);
 		if (fd < 0)
 			print_error("Error while opening the file", 1);
-		close(in_pipe[0]);
+		close(pipex->current[0]);
 		dup2(fd, STDIN_FILENO);
 		close(fd);
-		dup2(in_pipe[1], STDOUT_FILENO);
-		close(in_pipe[1]);
-		execute(cmd, envp);
+		dup2(pipex->current[1], STDOUT_FILENO);
+		close(pipex->current[1]);
+		execute(pipex->argv[2], pipex->envp);
 	}
-	else
-		waitpid(pid, &status, 0);
+	return (pid);
 }
 
-void	process_out(char *file, char *cmd, char **envp, int *in_pipe)
+pid_t	process_out(t_pipex *pipex)
 {
 	pid_t	pid;
 	int		fd;
-	int		status;
 
 	pid = fork();
 	if (pid < 0)
 		print_error("Error forking", 1);
 	else if (pid == 0)
 	{
-		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		fd = open(pipex->argv[4],
+				O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 			print_error("Error while opening the file", 1);
-		close(in_pipe[1]);
+		close(pipex->current[1]);
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
-		dup2(in_pipe[0], STDIN_FILENO);
-		close(in_pipe[0]);
-		execute(cmd, envp);
+		dup2(pipex->current[0], STDIN_FILENO);
+		execute(pipex->argv[3], pipex->envp);
 	}
 	else
 	{
-		close (in_pipe[0]);
-		close (in_pipe[1]);
-		waitpid(pid, &status, 0);
+		close (pipex->current[0]);
+		close (pipex->current[1]);
 	}
+	return (pid);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	int		my_pipe[2];
+	t_pipex	pipex;
+	pid_t	pids[2];
+	int		status;
 
+	pipex.argv = argv;
+	pipex.envp = envp;
 	if (argc != 5)
 		print_error("Incorrect format", 1);
-	if (pipe(my_pipe) < 0)
+	if (pipe(pipex.current) < 0)
 		print_error("Error creating the pipe", 1);
-	process_in(argv[1], argv[2], envp, my_pipe);
-	process_out(argv[4], argv[3], envp, my_pipe);
-	close(my_pipe[0]);
-	close(my_pipe[1]);
+	pids[0] = process_in(&pipex);
+	pids[1] = process_out(&pipex);
+	close(pipex.current[0]);
+	close(pipex.current[1]);
+	waitpid(pids[0], &status, 0);
+	waitpid(pids[1], &status, 0);
+	return (WEXITSTATUS(status));
 }
