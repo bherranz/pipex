@@ -25,12 +25,12 @@ pid_t	process_in(t_pipex *pipex)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking", 1);
+		print_error("fork", 1);
 	else if (pid == 0)
 	{
 		fd = open(pipex->argv[1], O_RDONLY);
 		if (fd < 0)
-			print_error("Error while opening the file", 1);
+			print_error(pipex->argv[1], 1);
 		close(pipex->current[0]);
 		dup2(fd, STDIN_FILENO);
 		close(fd);
@@ -48,13 +48,13 @@ pid_t	process_out(t_pipex *pipex)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking", 1);
+		print_error("fork", 1);
 	else if (pid == 0)
 	{
 		fd = open(pipex->argv[4],
 				O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
-			print_error("Error while opening the file", 1);
+			print_error(pipex->argv[4], 1);
 		close(pipex->current[1]);
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
@@ -80,7 +80,7 @@ int	main(int argc, char **argv, char **envp)
 	if (argc != 5)
 		print_error("Incorrect format", 1);
 	if (pipe(pipex.current) < 0)
-		print_error("Error creating the pipe", 1);
+		print_error("pipe", 1);
 	pids[0] = process_in(&pipex);
 	pids[1] = process_out(&pipex);
 	close(pipex.current[0]);

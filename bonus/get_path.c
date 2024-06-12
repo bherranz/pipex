@@ -52,9 +52,9 @@ void	access_path(char **rutes, char **cmd, char **envp)
 			print_error("fail in execution", 127);
 		}
 		rutes++;
+		if (path)
+			free(path);
 	}
-	if (path)
-		free(path);
 }
 
 void	execute(char *argv, char **envp)
@@ -62,6 +62,8 @@ void	execute(char *argv, char **envp)
 	char	**cmd;
 
 	cmd = ft_split(argv, ' ');
+	if (cmd == NULL)
+		print_error("split failed", 1);
 	if ((ft_strchr(argv, '/') != NULL))
 	{
 		execve(cmd[0], cmd, envp);

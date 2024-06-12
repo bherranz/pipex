@@ -19,12 +19,12 @@ pid_t	process_in(t_pipex *pipex)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking", 1);
+		print_error("fork", 1);
 	else if (pid == 0)
 	{
 		fd = open(pipex->argv[pipex->pos], O_RDONLY);
 		if (fd < 0)
-			print_error("Error while opening the file", 1);
+			print_error(pipex->argv[pipex->pos], 1);
 		close(pipex->current[0]);
 		dup2(fd, STDIN_FILENO);
 		close(fd);
@@ -46,7 +46,7 @@ int	get_fd(t_pipex *pipex)
 		fd = open(pipex->argv[(pipex->pos) + 1],
 				O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
-		print_error("Error while opening the file", 1);
+		print_error(pipex->argv[(pipex->pos) + 1], 1);
 	return (fd);
 }
 
@@ -57,7 +57,7 @@ pid_t	process_out(t_pipex *pipex)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking", 1);
+		print_error("fork", 1);
 	else if (pid == 0)
 	{
 		fd = get_fd(pipex);
@@ -81,7 +81,7 @@ pid_t	process_middle(t_pipex *pipex)
 
 	pid = fork();
 	if (pid < 0)
-		print_error("Error forking", 1);
+		print_error("fork", 1);
 	else if (pid == 0)
 	{
 		dup2(pipex->prev[0], STDIN_FILENO);
