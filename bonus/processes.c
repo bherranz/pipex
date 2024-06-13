@@ -22,7 +22,10 @@ pid_t	process_in(t_pipex *pipex)
 		print_error("fork", 1);
 	else if (pid == 0)
 	{
-		fd = open(pipex->argv[pipex->pos], O_RDONLY);
+		if (pipex->here_doc == 0)
+			fd = open(pipex->argv[pipex->pos], O_RDONLY);
+		else
+			fd = pipex->here_fd;
 		if (fd < 0)
 			print_error(pipex->argv[pipex->pos], 1);
 		close(pipex->current[0]);
@@ -30,7 +33,7 @@ pid_t	process_in(t_pipex *pipex)
 		close(fd);
 		dup2(pipex->current[1], STDOUT_FILENO);
 		close(pipex->current[1]);
-		execute(pipex->argv[(pipex->pos) + 1], pipex->envp);
+		execute(pipex->argv[(pipex->pos) + 1 + (pipex->here_doc)], pipex->envp);
 	}
 	return (pid);
 }

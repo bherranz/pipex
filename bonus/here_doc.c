@@ -34,29 +34,24 @@ void	here_doc(char *limit, int *my_pipe)
 		ft_putstr_fd(line, my_pipe[1]);
 		free(line);
 	}
+	close(my_pipe[0]);
+	close(my_pipe[1]);
+	exit(0);
 }
 
-pid_t	process_here(t_pipex *pipex)
+int	process_here(t_pipex *pipex)
 {
 	pid_t	pid;
 	int		here_pipe[2];
 
+	if (pipe(here_pipe) < 0)
+		print_error("Error creating the pipe", 1);
 	pid = fork();
 	if (pid < 0)
 		print_error("Error forking", 1);
 	else if (pid == 0)
-	{
-		if (pipe(here_pipe) < 0)
-			print_error("Error creating the pipe", 1);
 		here_doc(pipex->argv[(pipex->pos) + 1], here_pipe);
-		dup2(here_pipe[0], STDIN_FILENO);
-		close(here_pipe[0]);
-		dup2(pipex->current[1], STDOUT_FILENO);
-		close(pipex->current[0]);
-		close(pipex->current[1]);
-		close(here_pipe[1]);
-		execute(pipex->argv[(pipex->pos) + 2], pipex->envp);
-	}
+	close(here_pipe[1]);
 	waitpid(pid, NULL, 0);
-	return (pid);
+	return (here_pipe[0]);
 }

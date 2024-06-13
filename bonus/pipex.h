@@ -33,6 +33,7 @@ typedef struct s_pipex
 	char	**argv;
 	int		pos;
 	int		here_doc;
+	int		here_fd;
 }	t_pipex;
 
 char	**div_paths(char **evnp);
@@ -41,7 +42,7 @@ void	print_error(char *msg, int err);
 
 //processes
 pid_t	process_in(t_pipex *pipex);
-pid_t	process_here(t_pipex *pipex);
+int		process_here(t_pipex *pipex);
 pid_t	process_middle(t_pipex *pipex);
 int		get_fd(t_pipex *pipex);
 pid_t	process_out(t_pipex *pipex);

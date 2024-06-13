@@ -22,9 +22,8 @@ void	ft_pids(t_pipex *pipex, int argc, pid_t **pids)
 {
 	*pids = ft_calloc((argc - 2 - pipex->here_doc), sizeof(pid_t));
 	if (pipex->here_doc == 1)
-		(*pids)[0] = process_here(pipex);
-	else
-		(*pids)[0] = process_in(pipex);
+		pipex->here_fd = process_here(pipex);
+	(*pids)[0] = process_in(pipex);
 	pipex->pos += 2;
 	while (pipex->argv[pipex->pos + 2])
 	{
