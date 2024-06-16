@@ -25,7 +25,7 @@ ${NAME}: ${OBJS}
 		 ar rcs ${NAME} ${OBJS}
 
 .c.o:
-		${CC} ${CFLAGS} -c $< -o ${<:.c=.o}
+		@${CC} ${CFLAGS} -c $< -o ${<:.c=.o}
 
 clean:
 		${REMOVE} ${OBJS} ${BONUS_OBJS}
