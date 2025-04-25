@@ -3,13 +3,13 @@
 ## 📚 Table of Contents
 
 - [📄Description](#-description)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Compilation](#compilation)
-- [Bonus](#bonus)
-  - [Multiple Pipes](#multiple-pipes)
-  - [Support for `<<` and `>>`](#support-for--and-)
-- [Error Handling](#error-handling)
+- [⚙️Usage](#-usage)
+- [📌Examples](#-examples)
+- [🛠️Compilation](#-compilation)
+- [🔥Bonus](#-bonus)
+  - [🔁Multiple Pipes](#-multiple-pipes)
+  - [🔂Support for `<<` and `>>`](#-support-for--and-)
+- [⚠️Error Handling](#-error-handling)
 
 ---
 
