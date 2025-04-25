@@ -22,7 +22,7 @@ all: ${NAME}
 
 
 ${NAME}: ${OBJS}
-		 ar rcs ${NAME} ${OBJS}
+		 @ar rcs ${NAME} ${OBJS}
 
 .c.o:
 		@${CC} ${CFLAGS} -c $< -o ${<:.c=.o}

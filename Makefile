@@ -2,7 +2,7 @@ NAME = pipex
 BONUS_NAME = .bonus
 PROGRAM = pipex
 
-SRCS = main.c get_path.c
+SRCS = src/main.c src/get_path.c
 
 BONUS = bonus/main_bonus.c bonus/get_path_bonus.c bonus/here_doc_bonus.c \
 		bonus/gnl/get_next_line.c bonus/gnl/get_next_line_utils.c \
@@ -21,16 +21,16 @@ REMOVE = rm -f
 all: ${NAME}
 
 ${NAME}: ${OBJS} $(LIBFT)
-		${CC} ${CFLAGS} ${OBJS} -L$(LIBFT_DIR) -lft -o ${NAME}
+		@${CC} ${CFLAGS} ${OBJS} -L$(LIBFT_DIR) -lft -o ${NAME}
 
 bonus: ${BONUS_NAME}
 
 ${BONUS_NAME}: ${BONUS_OBJS} $(LIBFT)
 		@touch $(BONUS_NAME)
-		${CC} ${CFLAGS} ${BONUS_OBJS} -L$(LIBFT_DIR) -lft -o ${PROGRAM}
+		@${CC} ${CFLAGS} ${BONUS_OBJS} -L$(LIBFT_DIR) -lft -o ${PROGRAM}
 
 $(LIBFT):
-		make -C $(LIBFT_DIR) all
+		@make -C $(LIBFT_DIR) all
 
 clean:
 		${REMOVE} ${OBJS} ${BONUS_OBJS}
