@@ -2,7 +2,7 @@
 
 ## 📚 Table of Contents
 
-- [Description](#description)
+- [📄Description](#-description)
 - [Usage](#usage)
 - [Examples](#examples)
 - [Compilation](#compilation)
